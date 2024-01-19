@@ -1,0 +1,244 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={Meu primeiro relatório},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Meu primeiro relatório}
+\author{}
+\date{\vspace{-2.5em}2024-01-18}
+
+\begin{document}
+\maketitle
+
+\hypertarget{objetivo-geral}{%
+\section{Objetivo geral}\label{objetivo-geral}}
+
+Neste documento vamos apresentar funcionalidades do \emph{R Markdown}, e
+depois do \emph{Quarto}, utilizando dados no meio do documento.
+
+Os objetivos específicos desta análise são:
+
+\begin{itemize}
+\item
+  fazer uma tabela no meio do documento;
+\item
+  fazer um gráfico no meio do documento.
+\end{itemize}
+
+\hypertarget{material-do-documento}{%
+\subsection{Material do documento}\label{material-do-documento}}
+
+Neste documento vamos usar a base de dados de filme do IMDB, famoso site
+para registro de informações e avaliações sobre filmes. Abaixo temos uma
+amostra das informações contidas na base para 1 filme:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 38\tabcolsep) * \real{0.0204}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 38\tabcolsep) * \real{0.0184}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 38\tabcolsep) * \real{0.0102}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 38\tabcolsep) * \real{0.0327}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 38\tabcolsep) * \real{0.0347}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 38\tabcolsep) * \real{0.0163}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 38\tabcolsep) * \real{0.0102}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 38\tabcolsep) * \real{0.0163}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 38\tabcolsep) * \real{0.0204}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 38\tabcolsep) * \real{0.0163}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 38\tabcolsep) * \real{0.0245}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 38\tabcolsep) * \real{0.0204}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 38\tabcolsep) * \real{0.0306}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 38\tabcolsep) * \real{0.0245}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 38\tabcolsep) * \real{0.0531}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 38\tabcolsep) * \real{0.0388}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 38\tabcolsep) * \real{0.2347}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 38\tabcolsep) * \real{0.2918}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 38\tabcolsep) * \real{0.0429}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 38\tabcolsep) * \real{0.0429}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+id\_filme
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+titulo
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+ano
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+data\_lancamento
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+generos
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+duracao
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+pais
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+idioma
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+orcamento
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+receita
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+receita\_eua
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+nota\_imdb
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+num\_avaliacoes
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+direcao
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+roteiro
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+producao
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+elenco
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+descricao
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+num\_criticas\_publico
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+num\_criticas\_critica
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+tt0023352 & Prestige & 1931 & 1932-01-22 & Adventure, Drama & 71 & USA &
+English & NA & NA & NA & 5.7 & 240 & Tay Garnett & Harry Hervey, Tay
+Garnett & RKO Pathé Pictures & Ann Harding, Adolphe Menjou, Melvyn
+Douglas, Ian Maclaren, Guy Bates Post, Rollo Lloyd, Clarence Muse, Tetsu
+Komai & A woman travels to a French penal colony in Indo China to be
+with her fiancée, the commander. She arrives to find that he is now an
+alcoholic. & 12 & 2 \\
+\end{longtable}
+
+\hypertarget{evoluuxe7uxe3o-das-notas-dos-filmes-no-tempo}{%
+\subsection{Evolução das notas dos filmes no
+tempo}\label{evoluuxe7uxe3o-das-notas-dos-filmes-no-tempo}}
+
+Abaixo registramos a relação entre a variável tempo e nota no site:
+
+\includegraphics{primeiro_exemplo_rmd_files/figure-latex/unnamed-chunk-2-1.pdf}
+
+\hypertarget{outras-caracteruxedsticas-do-texto}{%
+\subsection{Outras características do
+texto}\label{outras-caracteruxedsticas-do-texto}}
+
+\textbf{Negrito}
+
+\begin{itemize}
+\tightlist
+\item
+  Ponto de parágrafo
+\end{itemize}
+
+Lista de itens:
+
+\begin{itemize}
+\tightlist
+\item
+  item 1
+\item
+  item 2
+\item
+  item 3
+\end{itemize}
+
+Lista de itens numerada:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  primeiro
+\item
+  segundo
+\item
+  terceiro
+\end{enumerate}
+
+ele conta sozinho tb:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  a
+\item
+  b
+\item
+  c
+\end{enumerate}
+
+eu uso pra colorir a letra desse jeito no Md no Python: {Este texto está
+em vermelho.}
+
+\end{document}

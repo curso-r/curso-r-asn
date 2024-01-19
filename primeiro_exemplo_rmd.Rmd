@@ -1,0 +1,130 @@
+---
+title: "Meu primeiro relatório"
+output:
+    ioslides_presentation
+date: "2024-01-18"
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+```
+
+#A
+
+## exemplo do rafael
+
+```{r echo = FALSE}
+selectInput("n_breaks", label = "Number of bins:",
+              choices = c(10, 20, 35, 50), selected = 20)
+
+sliderInput("bw_adjust", label = "Bandwidth adjustment:",
+              min = 0.2, max = 2, value = 1, step = 0.2)
+```
+
+```{r echo = FALSE}
+renderPlot({
+  hist(faithful$eruptions, probability = TRUE,
+       breaks = as.numeric(input$n_breaks),
+       xlab = "Duration (minutes)",
+       main = "Geyser eruption duration")
+
+  dens <- density(faithful$eruptions, adjust = input$bw_adjust)
+  lines(dens, col = "blue")
+})
+```
+
+# Objetivo geral
+
+Neste documento vamos apresentar funcionalidades do *R Markdown*, e depois do *Quarto*, utilizando dados no meio do documento.
+
+Os objetivos específicos desta análise são:
+
+- fazer uma tabela no meio do documento;
+
+- fazer um gráfico no meio do documento.
+
+## Material do documento
+
+Neste documento vamos usar a base de dados de filme do IMDB, famoso site para registro de informações e avaliações sobre filmes. Abaixo temos uma amostra das informações
+contidas na base para 1 filme:
+
+```{r}
+1+1
+```
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+library(readr)
+library(knitr)
+library(tidyverse)
+
+imdb <- read_csv2("imdb2.csv")
+
+kable(head(imdb, 1))
+```
+
+## Evolução das notas dos filmes no tempo
+
+Abaixo registramos a relação entre a variável tempo e nota no site:
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+plot(imdb$data_lancamento, imdb$nota_imdb)
+
+```
+
+## Outras características do texto
+
+**Negrito** 
+
+* Ponto de parágrafo
+
+Lista de itens:
+
+- item 1
+- item 2
+- item 3
+
+Lista de itens numerada:
+
+1. primeiro
+2. segundo
+3. terceiro
+
+ele conta sozinho tb:
+
+1. a
+1. b
+1. c
+
+eu uso pra colorir a letra desse jeito no Md no Python: <span style="color:red">Este texto está em vermelho, mas só em HTML.</span>
+
+# Mais computações
+
+Podemos fazer computações até razoavelmente complicadas dentro dos chunks!
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+imdb |> 
+  select(id_filme:idioma) |> 
+  head(5) |> 
+  kable()
+```
+
+A tabela abaixa mostra as produtoras de filmes da base ordenadas por quem tem mais filme:
+
+```{r}
+imdb |> 
+  group_by(producao) |> 
+  summarise(
+    numero_de_filmes = n()
+  ) |> 
+  arrange(desc(numero_de_filmes)) |> 
+  head(5) |> 
+  kable()
+```
+
+
+
+
+
