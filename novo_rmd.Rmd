@@ -1,0 +1,34 @@
+---
+title: "meu_relatorio"
+author: "eu"
+date: "2024-01-23"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, error = FALSE, message = FALSE)
+```
+
+# Relembrando como funciona o RMD (e o dplyr!)
+
+```{r lendo_dados}
+library(tidyverse)
+
+imdb <- read_csv2("imdb2.csv")
+```
+
+Vamos visualizar abaixo os diretores de filme de terror mais frequentes:
+
+```{r}
+imdb |> 
+  filter(
+    str_detect(generos, "Horror")
+    # agora, a | NÃO é mais um operador lógico, ela tá sendo interpretada
+    # literalmente porque está dentro de '"'
+  ) |> 
+  count(direcao) |> 
+  arrange(desc(n)) |> 
+  head(10) |> 
+  knitr::kable()
+```
+

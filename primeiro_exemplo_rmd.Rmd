@@ -1,9 +1,7 @@
 ---
 title: "Meu primeiro relatório"
-output:
-    ioslides_presentation
+output: html_document
 date: "2024-01-18"
-runtime: shiny
 ---
 
 ```{r setup, include=FALSE}
