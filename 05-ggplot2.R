@@ -217,9 +217,10 @@ ggplotly(grafico)
 #### coisas na tela se dividem entre:
 
 # objeto geométrico (dentro da caixa de X e Y)
-# escalas (que marjeiam o gráfico)
+# escalas (que marjeiam o gráfico) (legendas no geral!)
 # fundo
 # margem
+# 
 
 # respondendo a pergunta: 
 # função que serve pra mexer em escala
@@ -518,3 +519,387 @@ tabela_apoio|>
 # relativo dos geoms e vamos colocando os detalhes
 # por cima manualmente. não se preocupe porque esse é um caso
 # avançado mesmo...
+
+
+# revisao dos geoms -------------------------------------------------------
+
+# geom_point
+# geom_col
+# geom_line
+
+imdb |> 
+  mutate(
+    lucrou = ifelse(receita-orcamento > 0, "Lucrou", "Deu prejuízo")
+  ) |> 
+  drop_na() |> 
+  ggplot() +
+  geom_point(aes(x = orcamento, y = receita, color = lucrou, size = lucro))
+
+
+imdb |> 
+  drop_na(ano) |> 
+  group_by(
+    decada = floor(ano/10)*10
+  ) |> 
+  summarise(
+    orcamento_medio = mean(orcamento, na.rm = TRUE),
+    receita_media = mean(receita, na.rm = TRUE),
+    lucrou = receita_media > orcamento_medio
+  ) |> 
+  mutate(decada = as.character(decada)) |> 
+  ggplot(aes(x = orcamento_medio, y = receita_media,
+             color = decada, shape = lucrou)) + 
+  geom_point(size = 5)
+
+
+
+imdb |> 
+  drop_na(ano) |> 
+  group_by(
+    decada = floor(ano/10)*10
+  ) |> 
+  summarise(
+    percentual_que_lucrou = mean(receita > orcamento, na.rm = TRUE)
+  ) |> 
+  mutate(
+    indicador_pandemia = ifelse(decada == "2020", "Pandemia", "Pré-pandemia")
+  ) |> 
+  ggplot(aes(x = decada, y = percentual_que_lucrou, linetype = indicador_pandemia)) +
+  geom_col() + 
+  geom_line() +
+  geom_point(size = 4) 
+
+# Outros geoms...
+
+imdb |> 
+  filter(direcao == "Steven Spielberg") |> 
+  ggplot(aes(x = orcamento)) + 
+  geom_histogram(
+    binwidth = 100*10^6
+  )
+
+# deu certo, mas tá feio. outro gráfico:
+
+imdb |> 
+  ggplot(aes(x = nota_imdb)) + 
+  geom_histogram()
+
+# também tá feio:
+
+imdb |> 
+  ggplot(aes(x = nota_imdb)) + 
+  geom_histogram(color = 'white', fill = 'royalblue') +
+  theme_bw()
+
+imdb |> 
+  ggplot(aes(x = nota_imdb)) + 
+  #geom_histogram(color = 'white', fill = 'royalblue') +
+  geom_density()+
+  theme_bw()
+
+# tem como o histograma ficar "parecido" com a densidade!
+
+imdb |> 
+  ggplot(aes(x = nota_imdb)) + 
+  geom_freqpoly()
+
+# mas tem uma diferença importante: o freqpoly não é normalizado
+# o y é contagem e não frequência relativa
+
+?geom_freqpoly
+
+imdb |> 
+  mutate(decada = as.character(floor(ano/10)*10)) |> 
+  ggplot(aes(x = decada, y = nota_imdb, fill = decada)) + 
+  geom_boxplot()
+
+imdb |> 
+  mutate(decada = as.character(floor(ano/10)*10)) |> 
+  ggplot(aes(x = nota_imdb, fill = decada)) + 
+  geom_histogram(color = 'white')
+
+# como a gente poderia deixar esse gráfico melhor?
+
+# facet! fazendo vários gráficos de uma vez. vamos para um outro exemplo primeiro
+
+imdb |> 
+  filter(floor(ano/10)*10 == 1930) |> 
+  mutate(lucro = receita-orcamento,
+         lucrou = ifelse(lucro > 0, "Lucrou", "Deu prejuízo")) |> 
+  ggplot(aes(x = orcamento, y = receita, color = lucrou)) + 
+  geom_point()
+
+# uma opção é usar o facet:
+
+imdb |> 
+  mutate(decada = floor(ano/10)*10) |> 
+  mutate(lucro = receita-orcamento,
+         lucrou = ifelse(lucro > 0, "Lucrou", "Deu prejuízo")) |> 
+  ggplot(aes(x = orcamento, y = receita, color = lucrou)) + 
+  geom_point() +
+  facet_wrap(~decada)
+
+# por padrão as escalas de todos os gráficos, pra facilitar a comparação,
+# são as mesmas. se eu quiser que elas fiquem diferentes eu coloco
+# um parâmetro:
+
+
+imdb |> 
+  mutate(decada = floor(ano/10)*10) |> 
+  mutate(lucro = receita-orcamento,
+         lucrou = ifelse(lucro > 0, "Lucrou", "Deu prejuízo")) |> 
+  ggplot(aes(x = nota_imdb)) + 
+  geom_histogram() +
+  facet_wrap(~decada, scales = 'free_y')
+
+imdb |> 
+  mutate(decada = floor(ano/10)*10) |> 
+  mutate(lucro = receita-orcamento,
+         lucrou = ifelse(lucro > 0, "Lucrou", "Deu prejuízo")) |> 
+  ggplot(aes(x = nota_imdb)) + 
+  geom_density() +
+  facet_wrap(~decada, scales = 'free_y')
+
+imdb |> 
+  mutate(decada = floor(ano/10)*10) |> 
+  mutate(lucro = receita-orcamento,
+         lucrou = ifelse(lucro > 0, "Lucrou", "Deu prejuízo")) |> 
+  ggplot(aes(x = nota_imdb)) + 
+  geom_density() +
+  facet_wrap(~decada, scales = 'free_y', nrow = 8)
+
+# é um jeito mais automático de fazer a mesma coisa que
+# aparece no patchwork que vimos na ultima aula
+
+library(patchwork)
+
+grafico1 <- imdb |> 
+  mutate(decada = floor(ano/10)*10) |> 
+  filter(decada == 2000) |> 
+  mutate(lucro = receita-orcamento,
+         lucrou = ifelse(lucro > 0, "Lucrou", "Deu prejuízo")) |> 
+  ggplot(aes(x = nota_imdb)) + 
+  geom_density() 
+
+grafico2 <- imdb |> 
+  mutate(decada = floor(ano/10)*10) |> 
+  filter(decada == 2010) |> 
+  mutate(lucro = receita-orcamento,
+         lucrou = ifelse(lucro > 0, "Lucrou", "Deu prejuízo")) |> 
+  ggplot(aes(x = nota_imdb)) + 
+  geom_density()
+
+grafico1 + grafico2
+
+# o facet garante que as escalas conversam legal!
+
+dados_do_grafico <- imdb |> 
+  mutate(decada = as.character(floor(ano/10)*10)) |> 
+  filter(decada %in% c(2000, 2010)) 
+
+amostra_2010 <- dados_do_grafico |> 
+  filter(decada == 2010)
+
+amostra_2000 <- dados_do_grafico |> 
+  filter(decada == 2000)
+
+teste <- ks.test(x = amostra_2000$nota_imdb, y = amostra_2010$nota_imdb)
+
+teste <- t.test(x = amostra_2000$nota_imdb, y = amostra_2010$nota_imdb)
+
+dados_do_grafico |> 
+  mutate(lucro = receita-orcamento,
+         lucrou = ifelse(lucro > 0, "Lucrou", "Deu prejuízo")) |> 
+  ggplot(aes(x = nota_imdb, color = decada)) + 
+  geom_density() +
+  annotate("text", x = 5, y = 0.3,
+           label = paste0("Valor-p do teste de KS para igualdade:\n", teste$p.value))
+
+
+dados_do_grafico |> 
+  mutate(lucro = receita-orcamento,
+         lucrou = ifelse(lucro > 0, "Lucrou", "Deu prejuízo")) |> 
+  ggplot(aes(x = nota_imdb, color = decada)) + 
+  geom_density() +
+  ggtitle("Densidade das notas do imdb nas décadas de 2000 e 2010", 
+          subtitle = paste0("Valor-p do teste de KS para igualdade das dists:\n", teste$p.value)) +
+  theme_bw()
+
+imdb |> 
+  mutate(decada = as.character(floor(ano/10)*10)) |> 
+  mutate(lucro = receita-orcamento,
+         lucrou = ifelse(lucro > 0, "Lucrou", "Deu prejuízo")) |> 
+  ggplot(aes(x = nota_imdb, color = decada)) + 
+  geom_density() +
+  facet_wrap(~decada)
+
+# Títulos e labels
+
+imdb |> 
+  drop_na() |> 
+  mutate(lucro = ifelse(orcamento > receita, "Prejuízo", "Lucro")) |> 
+  ggplot(aes(x = orcamento, y = receita, color = lucro)) +
+  geom_point() +
+  labs(
+    x = "Orçamento ($ USD)",
+    y = "Receita ($ USD)",
+    title = "Gráfico de dispersão",
+    subtitle = "Receita vs. Orçamento, ambos em dólares",
+    color = "",
+    caption = "Fonte: IMDB"
+  )
+
+# a função labs te dá controle sobre o título de tudo que é "escala" ou "legenda"
+
+# labs é tipo uma "super" ggtitle
+
+
+# exemplo clássico de escala x/y zoada. quando é dinheiro, e é dinheiro grande:
+imdb |> 
+  drop_na() |> 
+  mutate(lucro = ifelse(orcamento > receita, "Prejuízo", "Lucro")) |> 
+  ggplot(aes(x = orcamento, y = receita, color = lucro)) +
+  geom_point() +
+  labs(
+    x = "Orçamento ($ USD)",
+    y = "Receita ($ USD)",
+    title = "Gráfico de dispersão",
+    subtitle = "Receita vs. Orçamento, ambos em dólares",
+    color = "",
+    caption = "Fonte: IMDB"
+  ) +
+  scale_x_continuous(
+    #breaks = c(0, 50*10^6, 100*10^6, 300*10^6, 400*10^6) na mão
+    breaks = seq(0, 300*10^6, 50*10^6),
+    # onde que o x vai quebrar
+    labels = function(x){x/10^6}
+    # define o que vai aparecer como RÓTULO pra cada x.
+    # uma função que divide por 10^6 por exemplo é uma boa
+  )
+
+# CUIDADO! o eixo não sabe que vc dividiu por 10^6
+
+imdb |> 
+  drop_na() |> 
+  mutate(lucro = ifelse(orcamento > receita, "Prejuízo", "Lucro")) |> 
+  ggplot(aes(x = orcamento, y = receita, color = lucro)) +
+  geom_point() +
+  labs(
+    x = "Orçamento (MM $ USD)",
+    y = "Receita (MM $ USD)",
+    title = "Gráfico de dispersão",
+    subtitle = "Receita vs. Orçamento, ambos em dólares",
+    color = "",
+    caption = "Fonte: IMDB"
+  ) +
+  scale_x_continuous(
+    #breaks = c(0, 50*10^6, 100*10^6, 300*10^6, 400*10^6) na mão
+    breaks = seq(0, 300*10^6, 50*10^6),
+    # onde que o x vai quebrar
+    labels = function(x){
+      ifelse(x/10^6 > 200, paste0("GDE: ", x/10^6), x/10^6)}
+    # define o que vai aparecer como RÓTULO pra cada x.
+    # uma função que divide por 10^6 por exemplo é uma boa
+  ) +
+  scale_y_continuous(
+    #breaks = c(0, 50*10^6, 100*10^6, 300*10^6, 400*10^6) na mão
+    #breaks = seq(0, *10^6, 100*10^6),
+    # onde que o x vai quebrar
+    labels = function(x){x/10^6}
+    # define o que vai aparecer como RÓTULO pra cada x.
+    # uma função que divide por 10^6 por exemplo é uma boa
+  )
+
+# fazer a função que transforma o x às vezes não é muito prático
+
+# por isso no pacote scales tem um moooonte de funções prontas pra isso:
+
+funcao_pre_pronta <- scales::dollar_format(scale = 10^(-6), 
+                                           prefix = "$", big.mark = ".",
+                                           decimal.mark = ",",
+                                          suffix = "MM")
+
+rotulos <-   labs(
+  x = "Orçamento ($ USD)",
+  y = "Receita ($ USD)",
+  title = "Gráfico de dispersão",
+  subtitle = "Receita vs. Orçamento, ambos em dólares",
+  color = "",
+  caption = "Fonte: IMDB"
+)
+
+imdb |> 
+  drop_na() |> 
+  mutate(lucro = ifelse(orcamento > receita, "Prejuízo", "Lucro")) |> 
+  ggplot(aes(x = orcamento, y = receita, color = lucro)) +
+  geom_point() +
+  rotulos + 
+  scale_x_continuous(
+    #breaks = c(0, 50*10^6, 100*10^6, 300*10^6, 400*10^6) na mão
+    breaks = seq(0, 300*10^6, 50*10^6),
+    # onde que o x vai quebrar
+    labels = funcao_pre_pronta
+    # define o que vai aparecer como RÓTULO pra cada x.
+    # uma função que divide por 10^6 por exemplo é uma boa
+  ) +
+  scale_y_continuous(
+    breaks = seq(0, 3*10^9, 0.5*10^9),
+    #breaks = seq(0, *10^6, 100*10^6),
+    # onde que o x vai quebrar
+    labels = scales::dollar_format(scale = 10^(-9), 
+                                   prefix = "$", big.mark = ".",
+                                   decimal.mark = ",",
+                                   suffix = "Bi")
+    # define o que vai aparecer como RÓTULO pra cada x.
+    # uma função que divide por 10^6 por exemplo é uma boa
+  ) +
+  theme_bw()
+
+# toda função pra mexer em escala/legenda vai se chamar scale_(atributo)_(continuous/discrete/...)
+
+# vamos focar primeiro, porque o resto é só caso particular, no contínuou (numérico/inteiro)
+# vs discreto
+
+# scale_x_
+# scale_fill_??
+# scale_color_??
+
+# tem um parâmetro de (quase) todos os scales que eu não falei nas continuas,
+# mas nas discretas é importante:
+  
+# values
+
+  imdb |> 
+  drop_na() |> 
+  mutate(lucro = ifelse(orcamento > receita, '0', '1')) |> 
+  ggplot(aes(x = orcamento, y = receita, color = lucro)) +
+  geom_point() +
+  rotulos + 
+  scale_x_continuous(
+    #breaks = c(0, 50*10^6, 100*10^6, 300*10^6, 400*10^6) na mão
+    breaks = seq(0, 300*10^6, 50*10^6),
+    # onde que o x vai quebrar
+    labels = funcao_pre_pronta
+    # define o que vai aparecer como RÓTULO pra cada x.
+    # uma função que divide por 10^6 por exemplo é uma boa
+  ) +
+  scale_y_continuous(
+    breaks = seq(0, 3*10^9, 0.5*10^9),
+    #breaks = seq(0, *10^6, 100*10^6),
+    # onde que o x vai quebrar
+    labels = scales::dollar_format(scale = 10^(-9), 
+                                   prefix = "$", big.mark = ".",
+                                   decimal.mark = ",",
+                                   suffix = "Bi")
+    # define o que vai aparecer como RÓTULO pra cada x.
+    # uma função que divide por 10^6 por exemplo é uma boa
+  ) +
+  scale_color_manual(values = c("0" = "darkred", "1" = "darkgreen"),
+                     labels = c("0" = "Prejuízo", "1" = "Lucro")) + 
+  theme_bw() +
+  theme(legend.position = 'bottom',
+        axis.text = element_text(face = "bold"))
+  # tudo que nós não vimos como mexer aqui nessa aula, praticamente,
+  # você altera pela função "theme"
+
+  

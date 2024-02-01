@@ -1,0 +1,162 @@
+---
+title: "Relatório"
+author: "Fernando"
+date: "2024-01-31"
+output:
+  bookdown::html_document2:
+    toc: TRUE
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, results = FALSE, warning = FALSE,
+                      fig.width = 5, fig.height = 5)
+
+library(tidyverse)
+
+imdb <- read_csv2("imdb2.csv")
+
+escala_x_milhoes <- scale_x_continuous(
+    breaks = seq(0, 300*10^6, 50*10^6),
+    labels = scales::dollar_format(scale = 10^(-9), 
+                                   prefix = "$", big.mark = ".",
+                                   decimal.mark = ",",
+                                   suffix = "Bi")
+  ) 
+
+escala_y_bilhoes <- scale_y_continuous(
+    breaks = seq(0, 3*10^9, 0.5*10^9),
+    labels = scales::dollar_format(scale = 10^(-9), 
+                                   prefix = "$", big.mark = ".",
+                                   decimal.mark = ",",
+                                   suffix = "Bi"))
+
+tema_do_relatorio <- theme_bw() +
+  theme(legend.position = 'bottom',
+        axis.text = element_text(face = "bold"))
+
+library(plotly)
+```
+
+# Introdução 
+
+Neste relatório vamos analisar dados do IMDB. Abaixo podemos ver a relação entre lurco e prejuízo. A figura \@ref(fig:dispersao) demonstra que a maior parte dos filme dão lucro.
+
+```{r dispersao, fig.cap="Gráfico de dispersão entre receita e orçamento.", fig.align='center'}
+imdb |> 
+  drop_na() |> 
+  mutate(lucro = ifelse(orcamento > receita, '0', '1')) |> 
+  ggplot(aes(x = orcamento, y = receita, color = lucro)) +
+  geom_point() +
+  labs(
+  x = "Orçamento ($ USD)",
+  y = "Receita ($ USD)",
+  title = "Gráfico de dispersão",
+  subtitle = "Receita vs. Orçamento, ambos em dólares",
+  color = "",
+  caption = "Fonte: IMDB") +
+  escala_x_milhoes +
+  escala_y_bilhoes +
+  scale_color_manual(values = c("0" = "darkred", "1" = "darkgreen"),
+                     labels = c("0" = "Prejuízo", "1" = "Lucro")) + 
+  tema_do_relatorio
+```
+
+```{r}
+imdb |> 
+  group_by(ano) |> 
+  summarise(
+    nota_imdb = mean(nota_imdb),
+    percentual_que_deu_lucro = mean(receita > orcamento, na.rm = TRUE)
+  ) |> 
+  mutate(
+    decada = factor(floor(ano/10)*10)
+  ) |> 
+  filter(percentual_que_deu_lucro > 0) |> 
+  ggplot(aes(x = nota_imdb, y = percentual_que_deu_lucro, label = ano, color = decada)) + 
+  geom_point() +
+  tema_do_relatorio
+```
+
+
+```{r}
+
+ggplotly(imdb |> 
+  group_by(ano) |> 
+  summarise(
+    nota_imdb = mean(nota_imdb),
+    percentual_que_deu_lucro = mean(receita > orcamento, na.rm = TRUE)
+  ) |> 
+  ggplot(aes(x = nota_imdb, y = percentual_que_deu_lucro, label = ano)) + 
+  geom_point() +
+  tema_do_relatorio)
+
+```
+
+```{r}
+imdb |> 
+  mutate(
+    tamanho_do_filme = case_when(
+      orcamento <= 10^6 ~ "Filme minúculo",
+      10^6 <= orcamento & orcamento <= 50*10^6 ~ "Filme médio",
+      orcamento > 50*10^6 ~ "Filme grande",
+      TRUE ~ "Sem orçamento"
+    )
+  ) |> 
+  group_by(ano, tamanho_do_filme) |> 
+  summarise(
+    freq = n(),
+    nota_imdb = mean(nota_imdb)
+  ) |> 
+  ggplot(aes(x = ano, y = nota_imdb, color = tamanho_do_filme)) + 
+  geom_point() +
+  theme(legend.position = 'bottom')
+```
+
+```{r}
+
+library(ggrepel)
+
+imdb |> 
+  drop_na() |> 
+  group_by(ano) |> 
+  mutate(
+    tamanho_do_filme = as.character(ntile(orcamento, 4))
+  ) |> 
+  group_by(ano) |> 
+  summarise(
+    freq = n(),
+    nota_imdb = mean(nota_imdb)
+  ) |> 
+  ggplot(aes(x = ano, y = nota_imdb, label = ano)) + 
+  geom_point() +
+  #geom_text() + 
+  geom_text_repel()+ 
+  theme(legend.position = 'bottom') +
+  tema_do_relatorio
+```
+
+```{r}
+library(ggrepel)
+
+imdb |> 
+  drop_na() |> 
+  group_by(ano = floor(ano/10)*10) |> 
+  mutate(
+    tamanho_do_filme = as.character(ntile(orcamento, 4))
+  ) |> 
+  group_by(ano) |> 
+  summarise(
+    freq = n(),
+    percentual_valor = mean(receita > orcamento, na.rm = TRUE),
+    percentual_de_filmes_com_lucro_texto = scales::percent(mean(receita > orcamento, na.rm = TRUE)),
+    nota_imdb = mean(nota_imdb)
+  ) |> 
+  ggplot(aes(x = ano, y = percentual_valor, label = percentual_de_filmes_com_lucro_texto)) + 
+  geom_col() +
+  geom_text(nudge_y = .05) + 
+  #geom_text() + 
+  #geom_text_repel()+ 
+  theme(legend.position = 'bottom') +
+  tema_do_relatorio
+```
+

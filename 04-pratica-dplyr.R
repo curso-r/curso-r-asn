@@ -227,3 +227,15 @@ imdb |>
     freq = n()
   )  |> View()
 
+# sugestão proposta: 
+
+base_filmes_decada <- imdb|>
+  mutate(decada = floor(ano/10)*10, lucro = receita - orcamento, .after = ano)
+
+base_filmes_decada |>
+  group_by(decada)|>
+  filter(lucro == max(lucro, na.rm = TRUE))|>
+  arrange(decada)|>
+  View()
+
+

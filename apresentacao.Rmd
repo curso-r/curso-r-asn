@@ -1,0 +1,181 @@
+---
+title: "R para Ciência de Dados 2"
+subtitle: "Introdução ao curso"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    nature:
+      ratio: '16:9'
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+```
+
+---
+class: middle, center, inverse
+# Git e Github
+
+---
+# Git
+
+- Git é um **sistema de versionamento**, criado por Linus Torvalds, autor do Linux.
+
+- É capaz de guardar o histórico de alterações de todos os arquivos dentro de uma pasta, que chamamos de repositório.
+
+- Funciona como o "*Track changes*" do word, mas muito melhor.
+
+- Torna-se importante à medida que seu trabalho é __colaborativo__.
+
+- **Git é um software que você instala no computador.**
+
+<br>
+
+```{r echo=FALSE, out.width="30%", fig.align='center'}
+knitr::include_graphics("img/02-organizacao-projeto/git.png")
+```
+
+---
+# GitHub
+
+- GitHub é um site onde você coloca e compartilha repositórios Git.
+
+- Utilizado por milhões de pessoas em projetos de código aberto ou fechado.
+
+- Útil para colaborar com outros programadores em projetos de ciência de dados.
+
+- Existem alternativas, como [GitLab](https://about.gitlab.com/) e [BitBucket](https://bitbucket.org/product).
+
+- **GitHub é um site que você acessa na internet.**
+
+<br>
+
+```{r echo=FALSE, out.width="40%", fig.align='center'}
+knitr::include_graphics("img/02-organizacao-projeto/github.png")
+```
+
+---
+# Projetos e GitHub
+
+No nosso caso, projeto e repositório serão termos equivalentes.
+
+**Projetos do R e repositórios do GitHub são melhores amigos.**
+
+```{r echo=FALSE, out.width="40%", fig.align='center'}
+knitr::include_graphics("img/02-organizacao-projeto/hug.gif")
+```
+
+---
+# Fluxo de trabalho
+
+O diagrama abaixo exemplifica o fluxo de trabalho de um projeto com versionamento.
+
+```{r echo=FALSE, fig.align='center', out.width="70%"}
+knitr::include_graphics("img/02-organizacao-projeto/fluxo_github_rstudio.png")
+```
+
+---
+# Passo 1: crie e configure seu projeto
+
+```{r eval=FALSE}
+usethis::create_project("meuProjeto")
+```
+
+Quanto aos nomes dos projetos, recomenda-se:
+
+- só ter letras, números e pontos;
+
+- começar com uma letra;
+
+- não acabar com ponto.
+
+---
+# Passo 2: adicione o Git
+
+```{r, eval=FALSE}
+usethis::use_git()
+```
+
+- Rodando o comando acima na pasta do projeto (a nova janela do RStudio que
+apareceu) você adiciona controle de versão.
+
+- Você receberá algumas instruções para seguir, mas está tudo certo.
+
+---
+# Passo 2½: Configure seu usuário do Git
+
+```{r eval=FALSE}
+usethis::use_git_config(
+  user.name = "SEU NOME NO GITHUB", 
+  user.email = "seu_email_no@github.com"
+)
+```
+
+- Em `user.name`, pode ser seu nome mesmo, não precisa ser o nickname.
+
+- O `user.email` precisa ser o que está vinculado à sua conta do GitHub.
+
+---
+# Passo 3: Adicione o GitHub
+
+```{r, eval=FALSE}
+usethis::use_github()
+```
+
+- O comando acima sincroniza a pasta com o GitHub.
+
+- Mais uma vez, você receberá algumas instruções, mas lembre-se apenas de selecionar o método de autenticação `https`.
+
+---
+# Personal Access Token
+
+- Ao conectar com o GitHub, você será instruída(o) a criar um *Personal Access Token* (PAT).
+
+- O PAT serve para autenticar ao github, podendo ser utilizado como senha de acesso ou internamente para automatizar tarefas (como criar um repositório).
+
+- Para criar seu PAT, rode `usethis::create_github_token()`. 
+
+- Para conectá-lo ao R, rode `gitcreds::gitcreds_set()` e cole o seu token no console quando ele for requisitado.
+
+Veja [aqui](https://curso-r.github.io/zen-do-r/git-github.html) um passo-a-passo mais detalhado.
+
+---
+# Passo 4: Stage & Commit
+
+```{r echo=FALSE, out.width="50%", fig.align='center'}
+knitr::include_graphics("img/02-organizacao-projeto/passo_3_commit_1.gif")
+```
+
+- Nesta etapa, você estará descrevendo as modificações que fez nos arquivos selecionados.
+
+- __Observação__: o ato de clicar no item é o passo de Stage.
+
+---
+
+# Passo 5: Push
+
+```{r, echo=FALSE, out.width="50%", fig.align='center'}
+knitr::include_graphics("img/02-organizacao-projeto/passo_4_push.gif")
+```
+
+- *Push* (ou *dar push*) significa atualizar o seu repositório remoto (GitHub) com os arquivos que você *commitou* no passo anterior.
+
+---
+
+# Passo Extra: Pull
+
+```{r, echo=FALSE, out.width="50%", fig.align='center'}
+knitr::include_graphics("img/02-organizacao-projeto/passo_5_pull.gif")
+```
+
+- *Pull* é a ação inversa do *Push*: você trará a versão mais recente dos arquivos do seu repositório remoto (GitHub) para a sua máquina (caso você tenha subido uma versão de um outro computador ou uma outra pessoa tenha subido uma atualização).
+
+---
+# Referências
+
+- [Zen do R](https://curso-r.github.io/zen-do-r/), livro em desenvolvimento pela Curso-R.
+
+- [Apresentação da Bea Milz](https://beatrizmilz.github.io/RLadies-Git-RStudio-2019).
